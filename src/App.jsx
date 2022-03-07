@@ -6,6 +6,9 @@ import "./App.css";
 function App() {
   const [gridData, setGridData] = useState(employeeData);
   const [searchValue, setSearchValue] = useState("");
+  const [paginationInfo, setPaginationInfo] = useState({
+    pageSize: 0,
+  });
   const searchHandler = (e) => {
     const searchedValue = gridData.map((employee) =>
       employee.EmployeeName.toLowerCase().includes(
@@ -38,6 +41,12 @@ function App() {
     );
   };
 
+  const setPaginationHandler = (e) => {
+    setPaginationInfo({
+      pageSize: e.target.value,
+    });
+  };
+
   return (
     <div className="App">
       <input
@@ -49,6 +58,19 @@ function App() {
           searchHandler(e);
         }}
       />
+      <select
+        name="page"
+        id="page"
+        value={paginationInfo?.pageSize}
+        onChange={(e) => {
+          setPaginationHandler(e);
+        }}
+      >
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
       <table>
         <thead>
           <tr>
@@ -80,7 +102,10 @@ function App() {
         </thead>
         <tbody>
           {[...gridData]
-            .filter((item) => item?.isActive)
+            .filter((item, i, array) => {
+              const paginatedArray = array.length / paginationInfo?.pageSize;
+              return item?.isActive && i < paginationInfo?.pageSize;
+            })
             .map((employee) => (
               <tr key={employee.EmployeeId}>
                 <td>{employee?.EmployeeName}</td>
@@ -93,6 +118,7 @@ function App() {
             ))}
         </tbody>
       </table>
+      
     </div>
   );
 }
