@@ -43,37 +43,6 @@ function App() {
     );
   };
 
-  const setPaginationHandler = (e) => {
-    const pageSize = +e?.target?.value;
-    const pageData = [...gridData].map((item, index, array) => {
-      const isActive =
-        index >= (paginationInfo?.currentPage - 1) * pageSize &&
-        index <= (paginationInfo?.currentPage - 1) * pageSize + pageSize - 1;
-      return isActive
-        ? { ...item, isActive: true }
-        : { ...item, isActive: false };
-    });
-    setGridData(pageData);
-    setPaginationInfo((prev) => ({ ...prev, pageSize }));
-  };
-
-  const setPageHandler = (e) => {
-    const currentPage = +e?.target?.value;
-    const pageData = [...gridData].map((item, index, array) => {
-      const isActive =
-        index >= (currentPage - 1) * paginationInfo?.pageSize &&
-        index <=
-          (currentPage - 1) * paginationInfo?.pageSize +
-            paginationInfo?.pageSize -
-            1;
-      return isActive
-        ? { ...item, isActive: true }
-        : { ...item, isActive: false };
-    });
-    setGridData(pageData);
-    setPaginationInfo((prev) => ({ ...prev, currentPage }));
-  };
-
   const paginationHandler = (pageSize, currentPage) => {
     const pageData = [...gridData].map((item, index, array) => {
       const isActive =
