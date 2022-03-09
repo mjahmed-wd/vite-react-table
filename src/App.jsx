@@ -9,7 +9,7 @@ function App() {
   const [paginationInfo, setPaginationInfo] = useState({
     pageSize: 10,
     currentPage: 1,
-    pageNumbers : [1]
+    pageNumbers: [1],
   });
   const searchHandler = (e) => {
     const searchedValue = gridData.map((employee) =>
@@ -52,9 +52,19 @@ function App() {
         ? { ...item, isActive: true }
         : { ...item, isActive: false };
     });
-    console.log((+currentPage - 1) * +pageSize,(+currentPage - 1) * +pageSize + +pageSize - 1)
+    const pageCounts = gridData?.length / +pageSize;
+    const pageNumbers = [];
+    for (let i = 1; i <= pageCounts; i++) {
+      pageNumbers.push(i);
+    }
+
     setGridData(pageData);
-    setPaginationInfo((prev) => ({ ...prev, pageSize, currentPage }));
+    setPaginationInfo((prev) => ({
+      ...prev,
+      pageSize,
+      currentPage,
+      pageNumbers,
+    }));
   };
 
   return (
@@ -76,7 +86,7 @@ function App() {
           value={paginationInfo?.pageSize}
           onChange={(e) => {
             // setPaginationHandler(e);
-            paginationHandler(e?.target?.value, paginationInfo?.currentPage)
+            paginationHandler(e?.target?.value, paginationInfo?.currentPage);
           }}
         >
           <option value="10">10</option>
@@ -92,14 +102,14 @@ function App() {
           id="currentPage"
           value={paginationInfo?.currentPage}
           onChange={(e) => {
-            paginationHandler(paginationInfo?.pageSize, e?.target?.value)
+            paginationHandler(paginationInfo?.pageSize, e?.target?.value);
           }}
         >
-          {}
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
+          {paginationInfo?.pageNumbers.map((pageNumber) => (
+            <option key={pageNumber} value={pageNumber}>
+              {pageNumber}
+            </option>
+          ))}
         </select>
       </div>
       <table>
@@ -135,7 +145,7 @@ function App() {
           {[...gridData]
             .filter((item, i, array) => item?.isActive)
             .map((employee) => (
-              <tr key={employee.EmployeeId}>
+              <tr key={employee?.EmployeeId}>
                 <td>{employee?.EmployeeName}</td>
                 <td>{employee?.EmployeeId}</td>
                 <td>{employee?.DepartmentName}</td>
