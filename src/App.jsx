@@ -7,7 +7,9 @@ function App() {
   const [gridData, setGridData] = useState(employeeData);
   const [searchValue, setSearchValue] = useState("");
   const [paginationInfo, setPaginationInfo] = useState({
-    pageSize: 0,
+    pageSize: 10,
+    currentPage: 1,
+    pageNumbers : [1]
   });
   const searchHandler = (e) => {
     const searchedValue = gridData.map((employee) =>
@@ -42,9 +44,48 @@ function App() {
   };
 
   const setPaginationHandler = (e) => {
-    setPaginationInfo({
-      pageSize: e.target.value,
+    const pageSize = +e?.target?.value;
+    const pageData = [...gridData].map((item, index, array) => {
+      const isActive =
+        index >= (paginationInfo?.currentPage - 1) * pageSize &&
+        index <= (paginationInfo?.currentPage - 1) * pageSize + pageSize - 1;
+      return isActive
+        ? { ...item, isActive: true }
+        : { ...item, isActive: false };
     });
+    setGridData(pageData);
+    setPaginationInfo((prev) => ({ ...prev, pageSize }));
+  };
+
+  const setPageHandler = (e) => {
+    const currentPage = +e?.target?.value;
+    const pageData = [...gridData].map((item, index, array) => {
+      const isActive =
+        index >= (currentPage - 1) * paginationInfo?.pageSize &&
+        index <=
+          (currentPage - 1) * paginationInfo?.pageSize +
+            paginationInfo?.pageSize -
+            1;
+      return isActive
+        ? { ...item, isActive: true }
+        : { ...item, isActive: false };
+    });
+    setGridData(pageData);
+    setPaginationInfo((prev) => ({ ...prev, currentPage }));
+  };
+
+  const paginationHandler = (pageSize, currentPage) => {
+    const pageData = [...gridData].map((item, index, array) => {
+      const isActive =
+        index >= (+currentPage - 1) * +pageSize &&
+        index <= (+currentPage - 1) * +pageSize + +pageSize - 1;
+      return isActive
+        ? { ...item, isActive: true }
+        : { ...item, isActive: false };
+    });
+    console.log((+currentPage - 1) * +pageSize,(+currentPage - 1) * +pageSize + +pageSize - 1)
+    setGridData(pageData);
+    setPaginationInfo((prev) => ({ ...prev, pageSize, currentPage }));
   };
 
   return (
@@ -58,19 +99,40 @@ function App() {
           searchHandler(e);
         }}
       />
-      <select
-        name="page"
-        id="page"
-        value={paginationInfo?.pageSize}
-        onChange={(e) => {
-          setPaginationHandler(e);
-        }}
-      >
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
+      <div>
+        <label htmlFor="pageSize">Page Size</label>
+        <select
+          name="pageSize"
+          id="pageSize"
+          value={paginationInfo?.pageSize}
+          onChange={(e) => {
+            // setPaginationHandler(e);
+            paginationHandler(e?.target?.value, paginationInfo?.currentPage)
+          }}
+        >
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="currentPage">Current Page</label>
+        <select
+          name="currentPage"
+          id="currentPage"
+          value={paginationInfo?.currentPage}
+          onChange={(e) => {
+            paginationHandler(paginationInfo?.pageSize, e?.target?.value)
+          }}
+        >
+          {}
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
       <table>
         <thead>
           <tr>
@@ -102,10 +164,7 @@ function App() {
         </thead>
         <tbody>
           {[...gridData]
-            .filter((item, i, array) => {
-              const paginatedArray = array.length / paginationInfo?.pageSize;
-              return item?.isActive && i < paginationInfo?.pageSize;
-            })
+            .filter((item, i, array) => item?.isActive)
             .map((employee) => (
               <tr key={employee.EmployeeId}>
                 <td>{employee?.EmployeeName}</td>
@@ -118,7 +177,6 @@ function App() {
             ))}
         </tbody>
       </table>
-      
     </div>
   );
 }
